@@ -88,6 +88,30 @@
             <input type="text" id="hostname" name="hostname" placeholder="Enter Router Hostname" required onchange="updatePreview()">
         </div>
 
+        <!-- OSM ID -->
+        <div class="form-group">
+            <label for="osmId">OSM ID:</label>
+            <input type="text" id="osmId" name="osmId" placeholder="Enter OSM ID" required onchange="updatePreview()">
+        </div>
+
+        <!-- Circuit ID -->
+        <div class="form-group">
+            <label for="circuitId">Circuit ID:</label>
+            <input type="text" id="circuitId" name="circuitId" placeholder="Enter Circuit ID" required onchange="updatePreview()">
+        </div>
+
+        <!-- Monitoring IP -->
+        <div class="form-group">
+            <label for="monitoringIp">Monitoring IP:</label>
+            <input type="text" id="monitoringIp" name="monitoringIp" placeholder="Enter Monitoring IP" required onchange="updatePreview()">
+        </div>
+
+        <!-- Customer Name -->
+        <div class="form-group">
+            <label for="customerName">Customer Name:</label>
+            <input type="text" id="customerName" name="customerName" placeholder="Enter Customer Name" required onchange="updatePreview()">
+        </div>
+
         <!-- Loopback IP -->
         <div class="form-group">
             <label for="loopbackIp">Loopback IP Address:</label>
@@ -172,6 +196,10 @@
 function generateMOP() {
     const vendor = document.getElementById('vendor').value;
     const hostname = document.getElementById('hostname').value;
+    const osmId = document.getElementById('osmId').value;
+    const circuitId = document.getElementById('circuitId').value;
+    const monitoringIp = document.getElementById('monitoringIp').value;
+    const customerName = document.getElementById('customerName').value;
     const loopbackIp = document.getElementById('loopbackIp').value;
     const wanInterface = document.getElementById('wanInterface').value;
     const wanIp = document.getElementById('wanIp').value;
@@ -186,10 +214,15 @@ function generateMOP() {
     const bgpPeerAs = document.getElementById('bgpPeerAs').value;
 
     // Predefined MOP Template
-    let mopContent = '';
+    let mopContent = `OSM ID: ${osmId}
+Customer Name: ${customerName}
+Circuit ID: ${circuitId}
+Monitoring IP: ${monitoringIp}
+
+`;
 
     if (vendor === 'Cisco') {
-        mopContent = `
+        mopContent += `
 hostname ${hostname}
 
 interface loopback 0
@@ -220,7 +253,7 @@ write memory
 end
 `;
     } else if (vendor === 'HP') {
-        mopContent = `
+        mopContent += `
 hostname ${hostname}
 
 interface loopback 0
@@ -235,7 +268,7 @@ interface ${lanInterface}
  no shutdown
 
 ip domain-name example.com
-user admin password mukesh
+user admin password <password>
 line vty 0 4
  login local
  transport input ssh
@@ -249,7 +282,7 @@ router bgp ${bgpAsNumber}
 write memory
 `;
     } else if (vendor === 'Huawei') {
-        mopContent = `
+        mopContent += `
 sysname ${hostname}
 
 interface LoopBack 0
@@ -288,18 +321,20 @@ function updatePreview() {
 }
 
 function downloadMOP() {
+    const osmId = document.getElementById('osmId').value;
     const hostname = document.getElementById('hostname').value;
+    const vendor = document.getElementById('vendor').value;
     const mopContent = document.getElementById('preview').textContent;
 
+    const fileName = `${osmId}_${hostname}_${vendor}.txt`;
     const blob = new Blob([mopContent], { type: 'text/plain' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${hostname}_MOP.txt`;
+    link.download = fileName;
     link.click();
 }
-
 </script>
 
 </body>
-            </html>
+    </html>
                 
