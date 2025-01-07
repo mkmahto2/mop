@@ -126,6 +126,34 @@
             <input type="text" id="lanSubnet" name="lanSubnet" placeholder="Enter LAN Subnet Mask" required onchange="updatePreview()">
         </div>
 
+        <!-- Default Route -->
+        <div class="form-group">
+            <label for="defaultRoute">Default Route (e.g., 0.0.0.0 0.0.0.0 <next-hop-ip>):</label>
+            <input type="text" id="defaultRoute" name="defaultRoute" placeholder="Enter Default Route" onchange="updatePreview()">
+        </div>
+
+        <!-- Static Route -->
+        <div class="form-group">
+            <label for="staticRoute">Static Route (e.g., <destination-network> <mask> <next-hop-ip>):</label>
+            <input type="text" id="staticRoute" name="staticRoute" placeholder="Enter Static Route" onchange="updatePreview()">
+        </div>
+
+        <!-- BGP Configuration -->
+        <div class="form-group">
+            <label for="bgpAsNumber">BGP AS Number:</label>
+            <input type="text" id="bgpAsNumber" name="bgpAsNumber" placeholder="Enter BGP AS Number" onchange="updatePreview()">
+        </div>
+
+        <div class="form-group">
+            <label for="bgpPeerIp">BGP Peer IP Address:</label>
+            <input type="text" id="bgpPeerIp" name="bgpPeerIp" placeholder="Enter BGP Peer IP Address" onchange="updatePreview()">
+        </div>
+
+        <div class="form-group">
+            <label for="bgpPeerAs">BGP Peer AS Number:</label>
+            <input type="text" id="bgpPeerAs" name="bgpPeerAs" placeholder="Enter BGP Peer AS Number" onchange="updatePreview()">
+        </div>
+
         <!-- Submit Button -->
         <button type="button" onclick="downloadMOP()">Download MOP</button>
     </form>
@@ -151,6 +179,11 @@
         const lanInterface = document.getElementById('lanInterface').value;
         const lanIp = document.getElementById('lanIp').value;
         const lanSubnet = document.getElementById('lanSubnet').value;
+        const defaultRoute = document.getElementById('defaultRoute').value;
+        const staticRoute = document.getElementById('staticRoute').value;
+        const bgpAsNumber = document.getElementById('bgpAsNumber').value;
+        const bgpPeerIp = document.getElementById('bgpPeerIp').value;
+        const bgpPeerAs = document.getElementById('bgpPeerAs').value;
 
         // Full MOP content based on the router vendor (Plain Text, no numbering)
         let mopContent = '';
@@ -177,6 +210,12 @@ line vty 0 4
  login local
  transport input ssh
 
+${defaultRoute ? `ip route ${defaultRoute}` : ''}
+${staticRoute ? `ip route ${staticRoute}` : ''}
+
+router bgp ${bgpAsNumber}
+ neighbor ${bgpPeerIp} remote-as ${bgpPeerAs}
+
 write memory
 end
 `;
@@ -202,6 +241,12 @@ line vty 0 4
  login local
  transport input ssh
 
+${defaultRoute ? `ip route ${defaultRoute}` : ''}
+${staticRoute ? `ip route ${staticRoute}` : ''}
+
+router bgp ${bgpAsNumber}
+ neighbor ${bgpPeerIp} remote-as ${bgpPeerAs}
+
 save config
 `;
         } else if (vendor === 'Huawei') {
@@ -223,6 +268,12 @@ stelnet server enable
 user-interface vty 0 4
  authentication-mode aaa
  protocol inbound ssh
+
+${defaultRoute ? `ip route-static ${defaultRoute}` : ''}
+${staticRoute ? `ip route-static ${staticRoute}` : ''}
+
+bgp ${bgpAsNumber}
+ peer ${bgpPeerIp} as-number ${bgpPeerAs}
 
 save
 quit
@@ -251,4 +302,5 @@ quit
 </script>
 
 </body>
-</html>
+            </html>
+                
