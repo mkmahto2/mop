@@ -168,28 +168,28 @@
 </div>
 
 <script>
-    function generateMOP() {
-        // Get form data
-        const vendor = document.getElementById('vendor').value;
-        const hostname = document.getElementById('hostname').value;
-        const loopbackIp = document.getElementById('loopbackIp').value;
-        const wanInterface = document.getElementById('wanInterface').value;
-        const wanIp = document.getElementById('wanIp').value;
-        const wanSubnet = document.getElementById('wanSubnet').value;
-        const lanInterface = document.getElementById('lanInterface').value;
-        const lanIp = document.getElementById('lanIp').value;
-        const lanSubnet = document.getElementById('lanSubnet').value;
-        const defaultRoute = document.getElementById('defaultRoute').value;
-        const staticRoute = document.getElementById('staticRoute').value;
-        const bgpAsNumber = document.getElementById('bgpAsNumber').value;
-        const bgpPeerIp = document.getElementById('bgpPeerIp').value;
-        const bgpPeerAs = document.getElementById('bgpPeerAs').value;
+// Function to generate the MOP based on the selected router and form values
+function generateMOP() {
+    const vendor = document.getElementById('vendor').value;
+    const hostname = document.getElementById('hostname').value;
+    const loopbackIp = document.getElementById('loopbackIp').value;
+    const wanInterface = document.getElementById('wanInterface').value;
+    const wanIp = document.getElementById('wanIp').value;
+    const wanSubnet = document.getElementById('wanSubnet').value;
+    const lanInterface = document.getElementById('lanInterface').value;
+    const lanIp = document.getElementById('lanIp').value;
+    const lanSubnet = document.getElementById('lanSubnet').value;
+    const defaultRoute = document.getElementById('defaultRoute').value ? `ip route ${document.getElementById('defaultRoute').value}` : '';
+    const staticRoute = document.getElementById('staticRoute').value ? `ip route ${document.getElementById('staticRoute').value}` : '';
+    const bgpAsNumber = document.getElementById('bgpAsNumber').value;
+    const bgpPeerIp = document.getElementById('bgpPeerIp').value;
+    const bgpPeerAs = document.getElementById('bgpPeerAs').value;
 
-        // Full MOP content based on the router vendor (Plain Text, no numbering)
-        let mopContent = '';
+    // Predefined MOP Template
+    let mopContent = '';
 
-        if (vendor === 'Cisco') {
-            mopContent += `
+    if (vendor === 'Cisco') {
+        mopContent = `
 hostname ${hostname}
 
 interface loopback 0
@@ -219,8 +219,8 @@ router bgp ${bgpAsNumber}
 write memory
 end
 `;
-        } else if (vendor === 'HP') {
-            mopContent += `
+    } else if (vendor === 'HP') {
+        mopContent = `
 hostname ${hostname}
 
 interface loopback 0
@@ -228,14 +228,13 @@ interface loopback 0
 
 interface ${wanInterface}
  ip address ${wanIp} ${wanSubnet}
- enable
+ no shutdown
 
 interface ${lanInterface}
  ip address ${lanIp} ${lanSubnet}
- enable
+ no shutdown
 
-crypto generate rsa
-ip ssh
+ip domain-name example.com
 user admin password <password>
 line vty 0 4
  login local
@@ -247,10 +246,10 @@ ${staticRoute ? `ip route ${staticRoute}` : ''}
 router bgp ${bgpAsNumber}
  neighbor ${bgpPeerIp} remote-as ${bgpPeerAs}
 
-save config
+write memory
 `;
-        } else if (vendor === 'Huawei') {
-            mopContent += `
+    } else if (vendor === 'Huawei') {
+        mopContent = `
 sysname ${hostname}
 
 interface LoopBack 0
@@ -278,27 +277,27 @@ bgp ${bgpAsNumber}
 save
 quit
 `;
-        }
-
-        // Display the MOP in the preview area
-        document.getElementById('preview').textContent = mopContent;
     }
 
-    function updatePreview() {
-        generateMOP();
-    }
+    // Display the MOP in the preview area
+    document.getElementById('preview').textContent = mopContent;
+}
 
-    function downloadMOP() {
-        const vendor = document.getElementById('vendor').value;
-        const hostname = document.getElementById('hostname').value;
-        const mopContent = document.getElementById('preview').textContent;
+function updatePreview() {
+    generateMOP();
+}
 
-        const blob = new Blob([mopContent], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${hostname}_MOP.txt`;
-        link.click();
-    }
+function downloadMOP() {
+    const hostname = document.getElementById('hostname').value;
+    const mopContent = document.getElementById('preview').textContent;
+
+    const blob = new Blob([mopContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${hostname}_MOP.txt`;
+    link.click();
+}
+
 </script>
 
 </body>
