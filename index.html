@@ -112,6 +112,15 @@
             <input type="text" id="customerName" name="customerName" placeholder="Enter Customer Name" required onchange="updatePreview()">
         </div>
 
+        <!-- Monitor Type Selection -->
+        <div class="form-group">
+            <label for="monitorType">Select Monitor Type:</label>
+            <select id="monitorType" name="monitorType" required onchange="updatePreview()">
+                <option value="WAN-based">WAN-based</option>
+                <option value="Loopback-based">Loopback-based</option>
+            </select>
+        </div>
+
         <!-- Loopback IP -->
         <div class="form-group">
             <label for="loopbackIp">Loopback IP Address:</label>
@@ -200,6 +209,7 @@ function generateMOP() {
     const circuitId = document.getElementById('circuitId').value;
     const monitoringIp = document.getElementById('monitoringIp').value;
     const customerName = document.getElementById('customerName').value;
+    const monitorType = document.getElementById('monitorType').value;
     const loopbackIp = document.getElementById('loopbackIp').value;
     const wanInterface = document.getElementById('wanInterface').value;
     const wanIp = document.getElementById('wanIp').value;
@@ -218,6 +228,7 @@ function generateMOP() {
 Customer Name: ${customerName}
 Circuit ID: ${circuitId}
 Monitoring IP: ${monitoringIp}
+Monitor Type: ${monitorType}
 
 `;
 
@@ -301,40 +312,5 @@ user-interface vty 0 4
  authentication-mode aaa
  protocol inbound ssh
 
-${defaultRoute ? `ip route-static ${defaultRoute}` : ''}
-${staticRoute ? `ip route-static ${staticRoute}` : ''}
-
-bgp ${bgpAsNumber}
- peer ${bgpPeerIp} as-number ${bgpPeerAs}
-
-save
-quit
-`;
-    }
-
-    // Display the MOP in the preview area
-    document.getElementById('preview').textContent = mopContent;
-}
-
-function updatePreview() {
-    generateMOP();
-}
-
-function downloadMOP() {
-    const osmId = document.getElementById('osmId').value;
-    const hostname = document.getElementById('hostname').value;
-    const vendor = document.getElementById('vendor').value;
-    const mopContent = document.getElementById('preview').textContent;
-
-    const fileName = `${osmId}_${hostname}_${vendor}.txt`;
-    const blob = new Blob([mopContent], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-}
-</script>
-
-</body>
-    </html>
-                
+${defaultRoute ? `ip route-static ${
+    
