@@ -1,106 +1,192 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Router Configuration</title>
+    <title>Device Configuration Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
         }
         label {
             display: block;
             margin: 10px 0 5px;
         }
-        input, textarea, button {
+        input, select, textarea {
             width: 100%;
-            padding: 10px;
-            margin: 5px 0 20px;
+            padding: 8px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            font-size: 16px;
         }
         button {
-            background-color: #007BFF;
+            background-color: #4CAF50;
             color: white;
+            padding: 10px 20px;
             border: none;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
+            background-color: #45a049;
+        }
+        textarea {
+            height: 200px;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .download-btn {
+            background-color: #007BFF;
+        }
+        .download-btn:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>Router Configuration Generator</h1>
+
+<div class="container">
+    <h1>Device Configuration Generator</h1>
     <form id="configForm">
-        <label for="hostname">Hostname:</label>
-        <input type="text" id="hostname" name="hostname" required>
-        
-        <label for="interface">Interface:</label>
-        <input type="text" id="interface" name="interface" required>
-        
-        <label for="loopback">Loopback IP:</label>
-        <input type="text" id="loopback" name="loopback" required>
-        
-        <label for="wan">WAN IP:</label>
-        <input type="text" id="wan" name="wan" required>
-        
-        <label for="cpe">CPE IP:</label>
-        <input type="text" id="cpe" name="cpe" required>
-        
-        <label for="lan">LAN IP:</label>
-        <input type="text" id="lan" name="lan" required>
-        
-        <button type="button" onclick="generateConfig()">Generate and Save Config</button>
+        <!-- Vendor Selection -->
+        <div class="form-group">
+            <label for="vendor">Select Vendor</label>
+            <select id="vendor" name="vendor">
+                <option value="cisco">Cisco</option>
+                <option value="hp">HP</option>
+                <option value="huawei">Huawei</option>
+            </select>
+        </div>
+
+        <!-- Hostname Input -->
+        <div class="form-group">
+            <label for="hostname">Hostname</label>
+            <input type="text" id="hostname" name="hostname" required>
+        </div>
+
+        <!-- Interface Input -->
+        <div class="form-group">
+            <label for="interface">Interface (e.g., GigabitEthernet0/1)</label>
+            <input type="text" id="interface" name="interface" required>
+        </div>
+
+        <!-- Loopback IP Input -->
+        <div class="form-group">
+            <label for="loopbackIp">Loopback IP</label>
+            <input type="text" id="loopbackIp" name="loopbackIp" required>
+        </div>
+
+        <!-- LAN Interface Input -->
+        <div class="form-group">
+            <label for="lanInterface">LAN Interface (e.g., Ethernet0/0)</label>
+            <input type="text" id="lanInterface" name="lanInterface" required>
+        </div>
+
+        <!-- LAN IP Input -->
+        <div class="form-group">
+            <label for="lanIp">LAN IP Address</label>
+            <input type="text" id="lanIp" name="lanIp" required>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Generate Configuration</button>
     </form>
 
-    <textarea id="output" rows="15" readonly></textarea>
+    <div id="output" style="margin-top: 30px;">
+        <h2>Generated Configuration:</h2>
+        <textarea id="configOutput" readonly></textarea>
+        <button id="downloadBtn" class="download-btn" style="display: none;">Download Configuration</button>
+    </div>
+</div>
 
-    <script>
-        function generateConfig() {
-            const hostname = document.getElementById('hostname').value;
-            const interface = document.getElementById('interface').value;
-            const loopback = document.getElementById('loopback').value;
-            const wan = document.getElementById('wan').value;
-            const cpe = document.getElementById('cpe').value;
-            const lan = document.getElementById('lan').value;
+<script>
+    document.getElementById('configForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            const ciscoConfig = `
-! Cisco Router Configuration
+        const vendor = document.getElementById('vendor').value;
+        const hostname = document.getElementById('hostname').value;
+        const interface = document.getElementById('interface').value;
+        const loopbackIp = document.getElementById('loopbackIp').value;
+        const lanInterface = document.getElementById('lanInterface').value;
+        const lanIp = document.getElementById('lanIp').value;
+
+        let config = '';
+        
+        // Cisco Configuration
+        if (vendor === 'cisco') {
+            config = `
 hostname ${hostname}
 interface ${interface}
- ip address ${wan} 255.255.255.0
- no shutdown
-!
-interface Loopback0
- ip address ${loopback} 255.255.255.255
-!
-ip route 0.0.0.0 0.0.0.0 ${cpe}
-`;
+  ip address ${loopbackIp} 255.255.255.255
+  no shutdown
+interface ${lanInterface}
+  ip address ${lanIp} 255.255.255.0
+  no shutdown
+            `;
+        }
 
-            const huaweiConfig = `
-# Huawei Router Configuration
-sysname ${hostname}
+        // HP Configuration
+        else if (vendor === 'hp') {
+            config = `
+hostname ${hostname}
 interface ${interface}
- ip address ${wan} 255.255.255.0
+  ip address ${loopbackIp} 255.255.255.255
+  no shutdown
+interface ${lanInterface}
+  ip address ${lanIp} 255.255.255.0
+  no shutdown
+            `;
+        }
+
+        // Huawei Configuration
+        else if (vendor === 'huawei') {
+            config = `
+system-view
+hostname ${hostname}
+interface ${interface}
+ ip address ${loopbackIp} 255.255.255.255
  undo shutdown
-#
-interface LoopBack0
- ip address ${loopback} 32
-#
-ip route-static 0.0.0.0 0 ${cpe}
-`;
+interface ${lanInterface}
+ ip address ${lanIp} 255.255.255.0
+ undo shutdown
+            `;
+        }
 
-            const combinedConfig = `Cisco Configuration:\n${ciscoConfig}\n\nHuawei Configuration:\n${huaweiConfig}`;
-            document.getElementById('output').value = combinedConfig;
+        // Output the configuration in the textarea
+        document.getElementById('configOutput').value = config.trim();
 
-            // Save to a text file
-            const blob = new Blob([combinedConfig], { type: 'text/plain' });
+        // Show the download button
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.style.display = 'inline-block';
+
+        // Setup the download functionality
+        downloadBtn.onclick = function() {
+            const blob = new Blob([config.trim()], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'router_config.txt';
+            link.download = `${hostname}-config.txt`;
             link.click();
-        }
-    </script>
+        };
+    });
+</script>
+
 </body>
 </html>
