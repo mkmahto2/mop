@@ -106,87 +106,25 @@
             <input type="text" id="lanIp" name="lanIp" required>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit">Generate Configuration</button>
-    </form>
+        <!-- LAN Subnet Input -->
+        <div class="form-group">
+            <label for="lanSubnet">LAN Subnet</label>
+            <input type="text" id="lanSubnet" name="lanSubnet" placeholder="e.g., 255.255.255.0" required>
+        </div>
 
-    <div id="output" style="margin-top: 30px;">
-        <h2>Generated Configuration:</h2>
-        <textarea id="configOutput" readonly></textarea>
-        <button id="downloadBtn" class="download-btn" style="display: none;">Download Configuration</button>
-    </div>
-</div>
+        <!-- WAN Interface Input -->
+        <div class="form-group">
+            <label for="wanInterface">WAN Interface (e.g., Ethernet0/1)</label>
+            <input type="text" id="wanInterface" name="wanInterface" required>
+        </div>
 
-<script>
-    document.getElementById('configForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+        <!-- WAN IP Input -->
+        <div class="form-group">
+            <label for="wanIp">WAN IP Address</label>
+            <input type="text" id="wanIp" name="wanIp" required>
+        </div>
 
-        const vendor = document.getElementById('vendor').value;
-        const hostname = document.getElementById('hostname').value;
-        const interface = document.getElementById('interface').value;
-        const loopbackIp = document.getElementById('loopbackIp').value;
-        const lanInterface = document.getElementById('lanInterface').value;
-        const lanIp = document.getElementById('lanIp').value;
-
-        let config = '';
-        
-        // Cisco Configuration
-        if (vendor === 'cisco') {
-            config = `
-hostname ${hostname}
-interface ${interface}
-  ip address ${loopbackIp} 255.255.255.255
-  no shutdown
-interface ${lanInterface}
-  ip address ${lanIp} 255.255.255.0
-  no shutdown
-            `;
-        }
-
-        // HP Configuration
-        else if (vendor === 'hp') {
-            config = `
-hostname ${hostname}
-interface ${interface}
-  ip address ${loopbackIp} 255.255.255.255
-  no shutdown
-interface ${lanInterface}
-  ip address ${lanIp} 255.255.255.0
-  no shutdown
-            `;
-        }
-
-        // Huawei Configuration
-        else if (vendor === 'huawei') {
-            config = `
-system-view
-hostname ${hostname}
-interface ${interface}
- ip address ${loopbackIp} 255.255.255.255
- undo shutdown
-interface ${lanInterface}
- ip address ${lanIp} 255.255.255.0
- undo shutdown
-            `;
-        }
-
-        // Output the configuration in the textarea
-        document.getElementById('configOutput').value = config.trim();
-
-        // Show the download button
-        const downloadBtn = document.getElementById('downloadBtn');
-        downloadBtn.style.display = 'inline-block';
-
-        // Setup the download functionality
-        downloadBtn.onclick = function() {
-            const blob = new Blob([config.trim()], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${hostname}-config.txt`;
-            link.click();
-        };
-    });
-</script>
-
-</body>
-</html>
+        <!-- WAN Subnet Input -->
+        <div class="form-group">
+            <label for="wanSubnet">WAN Subnet<
+                                                 
