@@ -62,6 +62,8 @@
             white-space: pre-wrap;
             font-family: monospace;
             word-wrap: break-word;
+            height: 300px;
+            overflow-y: scroll;
         }
     </style>
 </head>
@@ -151,123 +153,77 @@
         const lanSubnet = document.getElementById('lanSubnet').value;
 
         // Full MOP content based on the router vendor (Plain Text, no numbering)
-        let mopContent = `Router Vendor: ${vendor}\n\n`;
+        let mopContent = '';
 
         if (vendor === 'Cisco') {
             mopContent += `
-Configure Hostname:
 hostname ${hostname}
 
-Configure Loopback Interface:
 interface loopback 0
-ip address ${loopbackIp} 255.255.255.255
+ ip address ${loopbackIp} 255.255.255.255
 
-Configure WAN Interface:
 interface ${wanInterface}
-ip address ${wanIp} ${wanSubnet}
-no shutdown
+ ip address ${wanIp} ${wanSubnet}
+ no shutdown
 
-Configure LAN Interface:
 interface ${lanInterface}
-ip address ${lanIp} ${lanSubnet}
-no shutdown
+ ip address ${lanIp} ${lanSubnet}
+ no shutdown
 
-Configure Routing (EIGRP):
-router eigrp 1
-network ${wanIp} ${wanSubnet}
-network ${lanIp} ${lanSubnet}
-
-Configure NAT (if applicable):
-ip nat inside source list 1 interface ${wanInterface} overload
-access-list 1 permit ${lanIp} 0.0.0.255
-
-Configure SSH:
 ip domain-name example.com
 crypto key generate rsa usage-keys label ssh-key modulus 2048
 ip ssh version 2
 line vty 0 4
-login local
-transport input ssh
+ login local
+ transport input ssh
 
-Save Configuration:
 write memory
 end
 `;
         } else if (vendor === 'HP') {
             mopContent += `
-Configure Hostname:
 hostname ${hostname}
 
-Configure Loopback Interface:
 interface loopback 0
-ip address ${loopbackIp} 255.255.255.255
+ ip address ${loopbackIp} 255.255.255.255
 
-Configure WAN Interface:
 interface ${wanInterface}
-ip address ${wanIp} ${wanSubnet}
-enable
+ ip address ${wanIp} ${wanSubnet}
+ enable
 
-Configure LAN Interface:
 interface ${lanInterface}
-ip address ${lanIp} ${lanSubnet}
-enable
+ ip address ${lanIp} ${lanSubnet}
+ enable
 
-Configure Routing (Static or RIP):
-ip routing
-ip route 0.0.0.0 0.0.0.0 ${wanIp}
-
-Configure NAT:
-ip nat inside source list 1 interface ${wanInterface} overload
-access-list 1 permit ${lanIp} 0.0.0.255
-
-Configure SSH:
 crypto generate rsa
 ip ssh
 user admin password <password>
 line vty 0 4
-login local
-transport input ssh
+ login local
+ transport input ssh
 
-Save Configuration:
 save config
 `;
         } else if (vendor === 'Huawei') {
             mopContent += `
-Configure Hostname:
 sysname ${hostname}
 
-Configure Loopback Interface:
 interface LoopBack 0
-ip address ${loopbackIp} 255.255.255.255
+ ip address ${loopbackIp} 255.255.255.255
 
-Configure WAN Interface:
 interface ${wanInterface}
-ip address ${wanIp} ${wanSubnet}
-undo shutdown
+ ip address ${wanIp} ${wanSubnet}
+ undo shutdown
 
-Configure LAN Interface:
 interface ${lanInterface}
-ip address ${lanIp} ${lanSubnet}
-undo shutdown
+ ip address ${lanIp} ${lanSubnet}
+ undo shutdown
 
-Configure Routing (OSPF or Static):
-ospf 1
-area 0.0.0.0
-network ${wanIp} 0.0.0.255
-network ${lanIp} 0.0.0.255
-
-Configure NAT:
-nat address-group 1 ${lanIp} 255.255.255.0
-interface ${wanInterface}
-nat outbound
-
-Configure SSH:
 stelnet server enable
 user-interface vty 0 4
-authentication-mode aaa
-protocol inbound ssh
+ authentication-mode aaa
+ protocol inbound ssh
 
-Save Configuration:
 save
 quit
 `;
@@ -279,4 +235,20 @@ quit
 
     function updatePreview() {
         generateMOP();
-    
+    }
+
+    function downloadMOP() {
+        const vendor = document.getElementById('vendor').value;
+        const hostname = document.getElementById('hostname').value;
+        const mopContent = document.getElementById('preview').textContent;
+
+        const blob = new Blob([mopContent], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${hostname}_MOP.txt`;
+        link.click();
+    }
+</script>
+
+</body>
+</html>
