@@ -1,1 +1,106 @@
-index
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Router Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 20px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Router Configuration Generator</h1>
+    <form id="configForm">
+        <label for="hostname">Hostname:</label>
+        <input type="text" id="hostname" name="hostname" required>
+        
+        <label for="interface">Interface:</label>
+        <input type="text" id="interface" name="interface" required>
+        
+        <label for="loopback">Loopback IP:</label>
+        <input type="text" id="loopback" name="loopback" required>
+        
+        <label for="wan">WAN IP:</label>
+        <input type="text" id="wan" name="wan" required>
+        
+        <label for="cpe">CPE IP:</label>
+        <input type="text" id="cpe" name="cpe" required>
+        
+        <label for="lan">LAN IP:</label>
+        <input type="text" id="lan" name="lan" required>
+        
+        <button type="button" onclick="generateConfig()">Generate and Save Config</button>
+    </form>
+
+    <textarea id="output" rows="15" readonly></textarea>
+
+    <script>
+        function generateConfig() {
+            const hostname = document.getElementById('hostname').value;
+            const interface = document.getElementById('interface').value;
+            const loopback = document.getElementById('loopback').value;
+            const wan = document.getElementById('wan').value;
+            const cpe = document.getElementById('cpe').value;
+            const lan = document.getElementById('lan').value;
+
+            const ciscoConfig = `
+! Cisco Router Configuration
+hostname ${hostname}
+interface ${interface}
+ ip address ${wan} 255.255.255.0
+ no shutdown
+!
+interface Loopback0
+ ip address ${loopback} 255.255.255.255
+!
+ip route 0.0.0.0 0.0.0.0 ${cpe}
+`;
+
+            const huaweiConfig = `
+# Huawei Router Configuration
+sysname ${hostname}
+interface ${interface}
+ ip address ${wan} 255.255.255.0
+ undo shutdown
+#
+interface LoopBack0
+ ip address ${loopback} 32
+#
+ip route-static 0.0.0.0 0 ${cpe}
+`;
+
+            const combinedConfig = `Cisco Configuration:\n${ciscoConfig}\n\nHuawei Configuration:\n${huaweiConfig}`;
+            document.getElementById('output').value = combinedConfig;
+
+            // Save to a text file
+            const blob = new Blob([combinedConfig], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'router_config.txt';
+            link.click();
+        }
+    </script>
+</body>
+</html>
