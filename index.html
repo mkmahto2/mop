@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create MOP - Router Configuration</title>
+    <title>Create Full Router Configuration (MOP)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,17 +54,26 @@
             font-size: 14px;
             color: #777;
         }
+        .preview {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Create MOP (Method of Procedure)</h1>
+    <h1>Create Full Router Configuration (MOP)</h1>
     <form id="mopForm">
         <!-- Router Vendor Selection -->
         <div class="form-group">
             <label for="vendor">Select Router Vendor:</label>
-            <select id="vendor" name="vendor" required>
+            <select id="vendor" name="vendor" required onchange="updatePreview()">
                 <option value="Cisco">Cisco</option>
                 <option value="HP">HP</option>
                 <option value="Huawei">Huawei</option>
@@ -74,50 +83,54 @@
         <!-- Hostname -->
         <div class="form-group">
             <label for="hostname">Router Hostname:</label>
-            <input type="text" id="hostname" name="hostname" placeholder="Enter Router Hostname" required>
+            <input type="text" id="hostname" name="hostname" placeholder="Enter Router Hostname" required onchange="updatePreview()">
         </div>
 
         <!-- Loopback IP -->
         <div class="form-group">
             <label for="loopbackIp">Loopback IP Address:</label>
-            <input type="text" id="loopbackIp" name="loopbackIp" placeholder="Enter Loopback IP Address" required>
+            <input type="text" id="loopbackIp" name="loopbackIp" placeholder="Enter Loopback IP Address" required onchange="updatePreview()">
         </div>
 
         <!-- WAN Interface -->
         <div class="form-group">
             <label for="wanInterface">WAN Interface:</label>
-            <input type="text" id="wanInterface" name="wanInterface" placeholder="Enter WAN Interface (e.g., GigabitEthernet0/1)" required>
+            <input type="text" id="wanInterface" name="wanInterface" placeholder="Enter WAN Interface (e.g., GigabitEthernet0/1)" required onchange="updatePreview()">
         </div>
 
         <div class="form-group">
             <label for="wanIp">WAN IP Address:</label>
-            <input type="text" id="wanIp" name="wanIp" placeholder="Enter WAN IP Address" required>
+            <input type="text" id="wanIp" name="wanIp" placeholder="Enter WAN IP Address" required onchange="updatePreview()">
         </div>
 
         <div class="form-group">
             <label for="wanSubnet">WAN Subnet Mask:</label>
-            <input type="text" id="wanSubnet" name="wanSubnet" placeholder="Enter WAN Subnet Mask" required>
+            <input type="text" id="wanSubnet" name="wanSubnet" placeholder="Enter WAN Subnet Mask" required onchange="updatePreview()">
         </div>
 
         <!-- LAN Interface -->
         <div class="form-group">
             <label for="lanInterface">LAN Interface:</label>
-            <input type="text" id="lanInterface" name="lanInterface" placeholder="Enter LAN Interface (e.g., GigabitEthernet0/0)" required>
+            <input type="text" id="lanInterface" name="lanInterface" placeholder="Enter LAN Interface (e.g., GigabitEthernet0/0)" required onchange="updatePreview()">
         </div>
 
         <div class="form-group">
             <label for="lanIp">LAN IP Address:</label>
-            <input type="text" id="lanIp" name="lanIp" placeholder="Enter LAN IP Address" required>
+            <input type="text" id="lanIp" name="lanIp" placeholder="Enter LAN IP Address" required onchange="updatePreview()">
         </div>
 
         <div class="form-group">
             <label for="lanSubnet">LAN Subnet Mask:</label>
-            <input type="text" id="lanSubnet" name="lanSubnet" placeholder="Enter LAN Subnet Mask" required>
+            <input type="text" id="lanSubnet" name="lanSubnet" placeholder="Enter LAN Subnet Mask" required onchange="updatePreview()">
         </div>
 
         <!-- Submit Button -->
-        <button type="button" onclick="generateMOP()">Download MOP</button>
+        <button type="button" onclick="downloadMOP()">Download MOP</button>
     </form>
+
+    <div class="preview" id="preview">
+        <!-- The preview will appear here -->
+    </div>
 </div>
 
 <div class="footer">
@@ -137,84 +150,133 @@
         const lanIp = document.getElementById('lanIp').value;
         const lanSubnet = document.getElementById('lanSubnet').value;
 
-        // MOP content based on the router vendor
+        // Full MOP content based on the router vendor (Plain Text, no numbering)
         let mopContent = `Router Vendor: ${vendor}\n\n`;
 
         if (vendor === 'Cisco') {
             mopContent += `
-1. Configure Hostname:
-   hostname ${hostname}
+Configure Hostname:
+hostname ${hostname}
 
-2. Configure Loopback Interface:
-   interface loopback 0
-   ip address ${loopbackIp} 255.255.255.255
+Configure Loopback Interface:
+interface loopback 0
+ip address ${loopbackIp} 255.255.255.255
 
-3. Configure WAN Interface:
-   interface ${wanInterface}
-   ip address ${wanIp} ${wanSubnet}
+Configure WAN Interface:
+interface ${wanInterface}
+ip address ${wanIp} ${wanSubnet}
+no shutdown
 
-4. Configure LAN Interface:
-   interface ${lanInterface}
-   ip address ${lanIp} ${lanSubnet}
-   no shutdown
+Configure LAN Interface:
+interface ${lanInterface}
+ip address ${lanIp} ${lanSubnet}
+no shutdown
 
-5. Save Configuration:
-   write memory
-   end
+Configure Routing (EIGRP):
+router eigrp 1
+network ${wanIp} ${wanSubnet}
+network ${lanIp} ${lanSubnet}
+
+Configure NAT (if applicable):
+ip nat inside source list 1 interface ${wanInterface} overload
+access-list 1 permit ${lanIp} 0.0.0.255
+
+Configure SSH:
+ip domain-name example.com
+crypto key generate rsa usage-keys label ssh-key modulus 2048
+ip ssh version 2
+line vty 0 4
+login local
+transport input ssh
+
+Save Configuration:
+write memory
+end
 `;
         } else if (vendor === 'HP') {
             mopContent += `
-1. Configure Hostname:
-   hostname ${hostname}
+Configure Hostname:
+hostname ${hostname}
 
-2. Configure Loopback Interface:
-   interface loopback 0
-   ip address ${loopbackIp} 255.255.255.255
+Configure Loopback Interface:
+interface loopback 0
+ip address ${loopbackIp} 255.255.255.255
 
-3. Configure WAN Interface:
-   interface ${wanInterface}
-   ip address ${wanIp} ${wanSubnet}
+Configure WAN Interface:
+interface ${wanInterface}
+ip address ${wanIp} ${wanSubnet}
+enable
 
-4. Configure LAN Interface:
-   interface ${lanInterface}
-   ip address ${lanIp} ${lanSubnet}
-   enable
+Configure LAN Interface:
+interface ${lanInterface}
+ip address ${lanIp} ${lanSubnet}
+enable
 
-5. Save Configuration:
-   save config
+Configure Routing (Static or RIP):
+ip routing
+ip route 0.0.0.0 0.0.0.0 ${wanIp}
+
+Configure NAT:
+ip nat inside source list 1 interface ${wanInterface} overload
+access-list 1 permit ${lanIp} 0.0.0.255
+
+Configure SSH:
+crypto generate rsa
+ip ssh
+user admin password <password>
+line vty 0 4
+login local
+transport input ssh
+
+Save Configuration:
+save config
 `;
         } else if (vendor === 'Huawei') {
             mopContent += `
-1. Configure Hostname:
-   sysname ${hostname}
+Configure Hostname:
+sysname ${hostname}
 
-2. Configure Loopback Interface:
-   interface LoopBack 0
-   ip address ${loopbackIp} 255.255.255.255
+Configure Loopback Interface:
+interface LoopBack 0
+ip address ${loopbackIp} 255.255.255.255
 
-3. Configure WAN Interface:
-   interface ${wanInterface}
-   ip address ${wanIp} ${wanSubnet}
+Configure WAN Interface:
+interface ${wanInterface}
+ip address ${wanIp} ${wanSubnet}
+undo shutdown
 
-4. Configure LAN Interface:
-   interface ${lanInterface}
-   ip address ${lanIp} ${lanSubnet}
-   undo shutdown
+Configure LAN Interface:
+interface ${lanInterface}
+ip address ${lanIp} ${lanSubnet}
+undo shutdown
 
-5. Save Configuration:
-   save
-   quit
+Configure Routing (OSPF or Static):
+ospf 1
+area 0.0.0.0
+network ${wanIp} 0.0.0.255
+network ${lanIp} 0.0.0.255
+
+Configure NAT:
+nat address-group 1 ${lanIp} 255.255.255.0
+interface ${wanInterface}
+nat outbound
+
+Configure SSH:
+stelnet server enable
+user-interface vty 0 4
+authentication-mode aaa
+protocol inbound ssh
+
+Save Configuration:
+save
+quit
 `;
         }
 
-        // Create a Blob and trigger the download
-        const blob = new Blob([mopContent], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${hostname}_MOP.txt`;
-        link.click();
+        // Display the MOP in the preview area
+        document.getElementById('preview').textContent = mopContent;
     }
-</script>
 
-</body>
-</html>
+    function updatePreview() {
+        generateMOP();
+    
