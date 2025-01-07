@@ -1,10 +1,3 @@
-To create a **Download Button** with a dynamic filename based on the **OSM ID**, **Hostname**, and **Vendor** fields, and also display the **filename in the preview**, I've updated the code accordingly. The file name will be generated based on the user inputs, and the user can download the MOP configuration as a `.txt` file.
-
-Here’s the updated version of the code:
-
-### Updated HTML & JavaScript Code:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -204,7 +197,7 @@ Here’s the updated version of the code:
 </div>
 
 <div class="footer">
-    <p>&copy; 2025 MUKESH KUMAR MAHTO. All Rights Reserved.</p>
+    <p>&copy; 2025 Your Company. All Rights Reserved.</p>
 </div>
 
 <script>
@@ -216,4 +209,142 @@ function generateMOP() {
     const circuitId = document.getElementById('circuitId').value;
     const monitoringIp = document.getElementById('monitoringIp').value;
     const customerName = document.getElementById('customerName').value;
-    const monitorType = document.getElementById
+    const monitorType = document.getElementById('monitorType').value;
+    const loopbackIp = document.getElementById('loopbackIp').value;
+    const wanInterface = document.getElementById('wanInterface').value;
+    const wanIp = document.getElementById('wanIp').value;
+    const wanSubnet = document.getElementById('wanSubnet').value;
+    const lanInterface = document.getElementById('lanInterface').value;
+    const lanIp = document.getElementById('lanIp').value;
+    const lanSubnet = document.getElementById('lanSubnet').value;
+    const defaultRoute = document.getElementById('defaultRoute').value ? `ip route ${document.getElementById('defaultRoute').value}` : '';
+    const staticRoute = document.getElementById('staticRoute').value ? `ip route ${document.getElementById('staticRoute').value}` : '';
+    const bgpAsNumber = document.getElementById('bgpAsNumber').value;
+    const bgpPeerIp = document.getElementById('bgpPeerIp').value;
+    const bgpPeerAs = document.getElementById('bgpPeerAs').value;
+
+    // Predefined MOP Template
+    let mopContent = `OSM ID: ${osmId}
+Customer Name: ${customerName}
+Circuit ID: ${circuitId}
+Monitoring IP: ${monitoringIp}
+Monitor Type: ${monitorType}
+
+`;
+
+    if (vendor === 'Cisco') {
+        mopContent += `
+hostname ${hostname}
+
+interface loopback 0
+ ip address ${loopbackIp} 255.255.255.255
+
+interface ${wanInterface}
+ ip address ${wanIp} ${wanSubnet}
+ no shutdown
+
+interface ${lanInterface}
+ ip address ${lanIp} ${lanSubnet}
+ no shutdown
+
+ip domain-name example.com
+crypto key generate rsa usage-keys label ssh-key modulus 2048
+ip ssh version 2
+line vty 0 4
+ login local
+ transport input ssh
+
+${defaultRoute ? `ip route ${defaultRoute}` : ''}
+${staticRoute ? `ip route ${staticRoute}` : ''}
+
+router bgp ${bgpAsNumber}
+ neighbor ${bgpPeerIp} remote-as ${bgpPeerAs}
+
+write memory
+end
+`;
+    } else if (vendor === 'HP') {
+        mopContent += `
+hostname ${hostname}
+
+interface loopback 0
+ ip address ${loopbackIp} 255.255.255.255
+
+interface ${wanInterface}
+ ip address ${wanIp} ${wanSubnet}
+ no shutdown
+
+interface ${lanInterface}
+ ip address ${lanIp} ${lanSubnet}
+ no shutdown
+
+ip domain-name example.com
+user admin password <password>
+line vty 0 4
+ login local
+ transport input ssh
+
+${defaultRoute ? `ip route ${defaultRoute}` : ''}
+${staticRoute ? `ip route ${staticRoute}` : ''}
+
+router bgp ${bgpAsNumber}
+ neighbor ${bgpPeerIp} remote-as ${bgpPeerAs}
+
+write memory
+`;
+    } else if (vendor === 'Huawei') {
+        mopContent += `
+sysname ${hostname}
+
+interface LoopBack 0
+ ip address ${loopbackIp} 255.255.255.255
+
+interface ${wanInterface}
+ ip address ${wanIp} ${wanSubnet}
+ undo shutdown
+
+interface ${lanInterface}
+ ip address ${lanIp} ${lanSubnet}
+ undo shutdown
+
+stelnet server enable
+user-interface vty 0 4
+ authentication-mode aaa
+ protocol inbound ssh
+
+${defaultRoute ? `ip route-static ${defaultRoute}` : ''}
+${staticRoute ? `ip route-static ${staticRoute}` : ''}
+
+bgp ${bgpAsNumber}
+ peer ${bgpPeerIp} as-number ${bgpPeerAs}
+
+save
+quit
+`;
+    }
+
+    // Display the MOP in the preview area
+    document.getElementById('preview').textContent = mopContent;
+    // Update the download button filename
+    const fileName = `${osmId}_${hostname}_${vendor}.txt`;
+    document.querySelector('button').setAttribute('data-filename', fileName);
+}
+
+function updatePreview() {
+    generateMOP();
+}
+
+function downloadMOP() {
+    const mopContent = document.getElementById('preview').textContent;
+    const fileName = document.querySelector('button').getAttribute('data-filename');
+    const blob = new Blob([mopContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+}
+</script>
+
+</body>
+            </html>
+                
