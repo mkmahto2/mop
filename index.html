@@ -11,13 +11,6 @@
             padding: 20px;
             background-color: #f4f4f9;
         }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
         h1 {
             text-align: center;
             color: #333;
@@ -65,166 +58,206 @@
             height: 300px;
             overflow-y: scroll;
         }
+        /* Sliding Diagonals Background Effect */
+        .bg {
+            animation: slide 3s ease-in-out infinite alternate;
+            background-image: linear-gradient(-60deg, #6a82fb 50%, #fc5c7d 50%);
+            bottom: 0;
+            left: -50%;
+            opacity: 0.5;
+            position: fixed;
+            right: -50%;
+            top: 0;
+            z-index: 0;
+        }
+        .bg2 {
+            animation-direction: alternate-reverse;
+            animation-duration: 4s;
+        }
+        .bg3 {
+            animation-duration: 5s;
+        }
+        @keyframes slide {
+            0% {
+                transform: translateX(-25%);
+            }
+            100% {
+                transform: translateX(25%);
+            }
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
+    <div class="bg"></div>
+    <div class="bg bg2"></div>
+    <div class="bg bg3"></div>
 
-<div class="container">
-    <h1>Create Full Router Configuration (MOP)</h1>
-    <form id="mopForm">
-        <!-- Router Vendor Selection -->
-        <div class="form-group">
-            <label for="vendor">Select Router Vendor:</label>
-            <select id="vendor" name="vendor" required onchange="updatePreview()">
-                <option value="Cisco">Cisco</option>
-                <option value="HP">HP</option>
-                <option value="Huawei">Huawei</option>
-            </select>
+    <div class="content">
+        <h1>Create Full Router Configuration (MOP)</h1>
+        <form id="mopForm">
+            <!-- Router Vendor Selection -->
+            <div class="form-group">
+                <label for="vendor">Select Router Vendor:</label>
+                <select id="vendor" name="vendor" required onchange="updatePreview()">
+                    <option value="Cisco">Cisco</option>
+                    <option value="HP">HP</option>
+                    <option value="Huawei">Huawei</option>
+                </select>
+            </div>
+
+            <!-- Hostname -->
+            <div class="form-group">
+                <label for="hostname">Router Hostname:</label>
+                <input type="text" id="hostname" name="hostname" placeholder="Enter Router Hostname" required onchange="updatePreview()">
+            </div>
+
+            <!-- OSM ID -->
+            <div class="form-group">
+                <label for="osmId">OSM ID:</label>
+                <input type="text" id="osmId" name="osmId" placeholder="Enter OSM ID" required onchange="updatePreview()">
+            </div>
+
+            <!-- Circuit ID -->
+            <div class="form-group">
+                <label for="circuitId">Circuit ID:</label>
+                <input type="text" id="circuitId" name="circuitId" placeholder="Enter Circuit ID" required onchange="updatePreview()">
+            </div>
+
+            <!-- Monitoring IP -->
+            <div class="form-group">
+                <label for="monitoringIp">Monitoring IP:</label>
+                <input type="text" id="monitoringIp" name="monitoringIp" placeholder="Enter Monitoring IP" required onchange="updatePreview()">
+            </div>
+
+            <!-- Customer Name -->
+            <div class="form-group">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" name="customerName" placeholder="Enter Customer Name" required onchange="updatePreview()">
+            </div>
+
+            <!-- Monitor Type Selection -->
+            <div class="form-group">
+                <label for="monitorType">Select Monitor Type:</label>
+                <select id="monitorType" name="monitorType" required onchange="updatePreview()">
+                    <option value="WAN-based">WAN-based</option>
+                    <option value="Loopback-based">Loopback-based</option>
+                </select>
+            </div>
+
+            <!-- Loopback IP -->
+            <div class="form-group">
+                <label for="loopbackIp">Loopback IP Address:</label>
+                <input type="text" id="loopbackIp" name="loopbackIp" placeholder="Enter Loopback IP Address" required onchange="updatePreview()">
+            </div>
+
+            <!-- WAN Interface -->
+            <div class="form-group">
+                <label for="wanInterface">WAN Interface:</label>
+                <input type="text" id="wanInterface" name="wanInterface" placeholder="Enter WAN Interface (e.g., GigabitEthernet0/1)" required onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label for="wanIp">WAN IP Address:</label>
+                <input type="text" id="wanIp" name="wanIp" placeholder="Enter WAN IP Address" required onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label for="wanSubnet">WAN Subnet Mask:</label>
+                <input type="text" id="wanSubnet" name="wanSubnet" placeholder="Enter WAN Subnet Mask" required onchange="updatePreview()">
+            </div>
+
+            <!-- LAN Interface -->
+            <div class="form-group">
+                <label for="lanInterface">LAN Interface:</label>
+                <input type="text" id="lanInterface" name="lanInterface" placeholder="Enter LAN Interface (e.g., GigabitEthernet0/0)" required onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label for="lanIp">LAN IP Address:</label>
+                <input type="text" id="lanIp" name="lanIp" placeholder="Enter LAN IP Address" required onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label for="lanSubnet">LAN Subnet Mask:</label>
+                <input type="text" id="lanSubnet" name="lanSubnet" placeholder="Enter LAN Subnet Mask" required onchange="updatePreview()">
+            </div>
+
+            <!-- Default Route -->
+            <div class="form-group">
+                <label for="defaultRoute">Default Route (e.g., 0.0.0.0 0.0.0.0 &lt;next-hop-ip&gt;):</label>
+                <input type="text" id="defaultRoute" name="defaultRoute" placeholder="Enter Default Route" onchange="updatePreview()">
+            </div>
+
+            <!-- Static Route -->
+            <div class="form-group">
+                <label for="staticRoute">Static Route (e.g., &lt;destination-network&gt; &lt;mask&gt; &lt;next-hop-ip&gt;):</label>
+                <input type="text" id="staticRoute" name="staticRoute" placeholder="Enter Static Route" onchange="updatePreview()">
+            </div>
+
+            <!-- BGP Configuration -->
+            <div class="form-group">
+                <label for="bgpAsNumber">BGP AS Number:</label>
+                <input type="text" id="bgpAsNumber" name="bgpAsNumber" placeholder="Enter BGP AS Number" onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label for="bgpPeerIp">BGP Peer IP Address:</label>
+                <input type="text" id="bgpPeerIp" name="bgpPeerIp" placeholder="Enter BGP Peer IP Address" onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label for="bgpPeerAs">BGP Peer AS Number:</label>
+                <input type="text" id="bgpPeerAs" name="bgpPeerAs" placeholder="Enter BGP Peer AS Number" onchange="updatePreview()">
+            </div>
+
+            <!-- Download Button -->
+            <button type="button" onclick="downloadMOP()">Download MOP</button>
+        </form>
+
+        <div class="preview" id="preview">
+            <!-- The preview will appear here -->
         </div>
-
-        <!-- Hostname -->
-        <div class="form-group">
-            <label for="hostname">Router Hostname:</label>
-            <input type="text" id="hostname" name="hostname" placeholder="Enter Router Hostname" required onchange="updatePreview()">
-        </div>
-
-        <!-- OSM ID -->
-        <div class="form-group">
-            <label for="osmId">OSM ID:</label>
-            <input type="text" id="osmId" name="osmId" placeholder="Enter OSM ID" required onchange="updatePreview()">
-        </div>
-
-        <!-- Circuit ID -->
-        <div class="form-group">
-            <label for="circuitId">Circuit ID:</label>
-            <input type="text" id="circuitId" name="circuitId" placeholder="Enter Circuit ID" required onchange="updatePreview()">
-        </div>
-
-        <!-- Monitoring IP -->
-        <div class="form-group">
-            <label for="monitoringIp">Monitoring IP:</label>
-            <input type="text" id="monitoringIp" name="monitoringIp" placeholder="Enter Monitoring IP" required onchange="updatePreview()">
-        </div>
-
-        <!-- Customer Name -->
-        <div class="form-group">
-            <label for="customerName">Customer Name:</label>
-            <input type="text" id="customerName" name="customerName" placeholder="Enter Customer Name" required onchange="updatePreview()">
-        </div>
-
-        <!-- Monitor Type Selection -->
-        <div class="form-group">
-            <label for="monitorType">Select Monitor Type:</label>
-            <select id="monitorType" name="monitorType" required onchange="updatePreview()">
-                <option value="WAN-based">WAN-based</option>
-                <option value="Loopback-based">Loopback-based</option>
-            </select>
-        </div>
-
-        <!-- Loopback IP -->
-        <div class="form-group">
-            <label for="loopbackIp">Loopback IP Address:</label>
-            <input type="text" id="loopbackIp" name="loopbackIp" placeholder="Enter Loopback IP Address" required onchange="updatePreview()">
-        </div>
-
-        <!-- WAN Interface -->
-        <div class="form-group">
-            <label for="wanInterface">WAN Interface:</label>
-            <input type="text" id="wanInterface" name="wanInterface" placeholder="Enter WAN Interface (e.g., GigabitEthernet0/1)" required onchange="updatePreview()">
-        </div>
-
-        <div class="form-group">
-            <label for="wanIp">WAN IP Address:</label>
-            <input type="text" id="wanIp" name="wanIp" placeholder="Enter WAN IP Address" required onchange="updatePreview()">
-        </div>
-
-        <div class="form-group">
-            <label for="wanSubnet">WAN Subnet Mask:</label>
-            <input type="text" id="wanSubnet" name="wanSubnet" placeholder="Enter WAN Subnet Mask" required onchange="updatePreview()">
-        </div>
-
-        <!-- LAN Interface -->
-        <div class="form-group">
-            <label for="lanInterface">LAN Interface:</label>
-            <input type="text" id="lanInterface" name="lanInterface" placeholder="Enter LAN Interface (e.g., GigabitEthernet0/0)" required onchange="updatePreview()">
-        </div>
-
-        <div class="form-group">
-            <label for="lanIp">LAN IP Address:</label>
-            <input type="text" id="lanIp" name="lanIp" placeholder="Enter LAN IP Address" required onchange="updatePreview()">
-        </div>
-
-        <div class="form-group">
-            <label for="lanSubnet">LAN Subnet Mask:</label>
-            <input type="text" id="lanSubnet" name="lanSubnet" placeholder="Enter LAN Subnet Mask" required onchange="updatePreview()">
-        </div>
-
-        <!-- Default Route -->
-        <div class="form-group">
-            <label for="defaultRoute">Default Route (e.g., 0.0.0.0 0.0.0.0 <next-hop-ip>):</label>
-            <input type="text" id="defaultRoute" name="defaultRoute" placeholder="Enter Default Route" onchange="updatePreview()">
-        </div>
-
-        <!-- Static Route -->
-        <div class="form-group">
-            <label for="staticRoute">Static Route (e.g., <destination-network> <mask> <next-hop-ip>):</label>
-            <input type="text" id="staticRoute" name="staticRoute" placeholder="Enter Static Route" onchange="updatePreview()">
-        </div>
-
-        <!-- BGP Configuration -->
-        <div class="form-group">
-            <label for="bgpAsNumber">BGP AS Number:</label>
-            <input type="text" id="bgpAsNumber" name="bgpAsNumber" placeholder="Enter BGP AS Number" onchange="updatePreview()">
-        </div>
-
-        <div class="form-group">
-            <label for="bgpPeerIp">BGP Peer IP Address:</label>
-            <input type="text" id="bgpPeerIp" name="bgpPeerIp" placeholder="Enter BGP Peer IP Address" onchange="updatePreview()">
-        </div>
-
-        <div class="form-group">
-            <label for="bgpPeerAs">BGP Peer AS Number:</label>
-            <input type="text" id="bgpPeerAs" name="bgpPeerAs" placeholder="Enter BGP Peer AS Number" onchange="updatePreview()">
-        </div>
-
-        <!-- Download Button -->
-        <button type="button" onclick="downloadMOP()">Download MOP</button>
-    </form>
-
-    <div class="preview" id="preview">
-        <!-- The preview will appear here -->
     </div>
-</div>
 
-<div class="footer">
-    <p>&copy; 2025 Your Company. All Rights Reserved.</p>
-</div>
+    <div class="footer">
+        <p>&copy; 2025 Your Company. All Rights Reserved.</p>
+    </div>
 
-<script>
-// Function to generate the MOP based on the selected router and form values
-function generateMOP() {
-    const vendor = document.getElementById('vendor').value;
-    const hostname = document.getElementById('hostname').value;
-    const osmId = document.getElementById('osmId').value;
-    const circuitId = document.getElementById('circuitId').value;
-    const monitoringIp = document.getElementById('monitoringIp').value;
-    const customerName = document.getElementById('customerName').value;
-    const monitorType = document.getElementById('monitorType').value;
-    const loopbackIp = document.getElementById('loopbackIp').value;
-    const wanInterface = document.getElementById('wanInterface').value;
-    const wanIp = document.getElementById('wanIp').value;
-    const wanSubnet = document.getElementById('wanSubnet').value;
-    const lanInterface = document.getElementById('lanInterface').value;
-    const lanIp = document.getElementById('lanIp').value;
-    const lanSubnet = document.getElementById('lanSubnet').value;
-    const defaultRoute = document.getElementById('defaultRoute').value ? `ip route ${document.getElementById('defaultRoute').value}` : '';
-    const staticRoute = document.getElementById('staticRoute').value ? `ip route ${document.getElementById('staticRoute').value}` : '';
-    const bgpAsNumber = document.getElementById('bgpAsNumber').value;
-    const bgpPeerIp = document.getElementById('bgpPeerIp').value;
-    const bgpPeerAs = document.getElementById('bgpPeerAs').value;
+    <script>
+    // Function to generate the MOP based on the selected router and form values
+    function generateMOP() {
+        const vendor = document.getElementById('vendor').value;
+        const hostname = document.getElementById('hostname').value;
+        const osmId = document.getElementById('osmId').value;
+        const circuitId = document.getElementById('circuitId').value;
+        const monitoringIp = document.getElementById('monitoringIp').value;
+        const customerName = document.getElementById('customerName').value;
+        const monitorType = document.getElementById('monitorType').value;
+        const loopbackIp = document.getElementById('loopbackIp').value;
+        const wanInterface = document.getElementById('wanInterface').value;
+        const wanIp = document.getElementById('wanIp').value;
+        const wanSubnet = document.getElementById('wanSubnet').value;
+        const lanInterface = document.getElementById('lanInterface').value;
+        const lanIp = document.getElementById('lanIp').value;
+        const lanSubnet = document.getElementById('lanSubnet').value;
+        const defaultRoute = document.getElementById('defaultRoute').value ? document.getElementById('defaultRoute').value : '';
+        const staticRoute = document.getElementById('staticRoute').value ? document.getElementById('staticRoute').value : '';
+        const bgpAsNumber = document.getElementById('bgpAsNumber').value;
+        const bgpPeerIp = document.getElementById('bgpPeerIp').value;
+        const bgpPeerAs = document.getElementById('bgpPeerAs').value;
 
-    // Predefined MOP Template
-    let mopContent = `OSM ID: ${osmId}
+        // Predefined MOP Template
+        let mopContent = `OSM ID: ${osmId}
 Customer Name: ${customerName}
 Circuit ID: ${circuitId}
 Monitoring IP: ${monitoringIp}
@@ -232,8 +265,8 @@ Monitor Type: ${monitorType}
 
 `;
 
-    if (vendor === 'Cisco') {
-        mopContent += `
+        if (vendor === 'Cisco') {
+            mopContent += `
 hostname ${hostname}
 
 interface loopback 0
@@ -263,8 +296,8 @@ router bgp ${bgpAsNumber}
 write memory
 end
 `;
-    } else if (vendor === 'HP') {
-        mopContent += `
+        } else if (vendor === 'HP') {
+            mopContent += `
 hostname ${hostname}
 
 interface loopback 0
@@ -292,8 +325,8 @@ router bgp ${bgpAsNumber}
 
 write memory
 `;
-    } else if (vendor === 'Huawei') {
-        mopContent += `
+        } else if (vendor === 'Huawei') {
+            mopContent += `
 sysname ${hostname}
 
 interface LoopBack 0
@@ -321,30 +354,33 @@ bgp ${bgpAsNumber}
 save
 quit
 `;
+        }
+
+        // Display the MOP in the preview area
+        document.getElementById('preview').textContent = mopContent;
+        // Update the download button filename
+        const fileName = `${osmId}_${hostname}_${vendor}.txt`;
+        document.querySelector('button').setAttribute('data-filename', fileName);
     }
 
-    // Display the MOP in the preview area
-    document.getElementById('preview').textContent = mopContent;
-    // Update the download button filename
-    const fileName = `${osmId}_${hostname}_${vendor}.txt`;
-    document.querySelector('button').setAttribute('data-filename', fileName);
-}
+    function updatePreview() {
+        generateMOP();
+    }
 
-function updatePreview() {
-    generateMOP();
-}
+    function downloadMOP() {
+        const mopContent = document.getElementById('preview').textContent;
+        const fileName = document.querySelector('button').getAttribute('data-filename');
+        const blob = new Blob([mopContent], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+    }
 
-function downloadMOP() {
-    const mopContent = document.getElementById('preview').textContent;
-    const fileName = document.querySelector('button').getAttribute('data-filename');
-    const blob = new Blob([mopContent], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-}
-</script>
-
+    // Initialize preview on page load
+    window.onload = function() {
+        updatePreview();
+    };
+    </script>
 </body>
-            </html>
-                
+</html>
